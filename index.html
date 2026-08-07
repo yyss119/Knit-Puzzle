@@ -452,7 +452,7 @@ canvas { display:block; image-rendering:pixelated; }
         <button class="act-btn" id="btn-reset">↺ 초기화</button>
         <button class="act-btn" id="btn-done">✓ 완성!</button>
       </div>
-      <div class="fill-hint">우클릭(PC) · 꾹 누르기(모바일) → 한 줄 채우기</div>
+      <div class="fill-hint">우클릭 가로드래그 → 행 채우기 · 세로드래그 → 열 채우기</div>
       <div style="text-align:center;margin-top:8px">
         <button id="btn-menu">☰ 패턴 목록</button>
       </div>
@@ -1013,14 +1013,48 @@ function fillRow(cell){
   drawPlayer(); updateProgress();
 }
 
-wrap.addEventListener('contextmenu',e=>{ e.preventDefault(); fillRow(cellFromEvent(e)); });
+// ── 세로 채우기 ──
+function fillCol(cell){
+  if(!cell) return;
+  const [,c]=cell.split(',').map(Number);
+  const val=isEraser?0:colorIdx+1;
+  for(let r=0;r<lvl.rows;r++) playerGrid[r*lvl.cols+c]=val;
+  drawPlayer(); updateProgress();
+}
 
-let longPressTimer=null;
+// PC: 우클릭 드래그 방향 감지 → 가로=행, 세로=열
+let rightStart=null;
+wrap.addEventListener('mousedown',e=>{
+  if(e.button===2) rightStart={x:e.clientX,y:e.clientY,cell:cellFromEvent(e)};
+});
+window.addEventListener('mouseup',e=>{
+  if(e.button===2&&rightStart){
+    const dx=Math.abs(e.clientX-rightStart.x), dy=Math.abs(e.clientY-rightStart.y);
+    if(dx>=dy) fillRow(rightStart.cell); else fillCol(rightStart.cell);
+    rightStart=null;
+  }
+});
+wrap.addEventListener('contextmenu',e=>e.preventDefault());
+
+// 모바일: 롱프레스 방향 감지 → 가로=행, 세로=열
+let lpStart=null, lpLatest=null, lpTimer=null;
 wrap.addEventListener('touchstart',e=>{
-  longPressTimer=setTimeout(()=>{ longPressTimer=null; fillRow(cellFromEvent(e.touches[0])); },500);
+  const t=e.touches[0];
+  lpStart={x:t.clientX,y:t.clientY,cell:cellFromEvent(t)};
+  lpLatest={x:t.clientX,y:t.clientY};
+  lpTimer=setTimeout(()=>{
+    lpTimer=null;
+    const dx=Math.abs(lpLatest.x-lpStart.x), dy=Math.abs(lpLatest.y-lpStart.y);
+    if(dy>dx&&dy>4) fillCol(lpStart.cell); else fillRow(lpStart.cell);
+  },500);
 },{passive:true});
-wrap.addEventListener('touchend',()=>{ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
-wrap.addEventListener('touchmove',()=>{ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+wrap.addEventListener('touchmove',e=>{
+  if(!lpStart) return;
+  const t=e.touches[0]; lpLatest={x:t.clientX,y:t.clientY};
+  const dx=Math.abs(lpLatest.x-lpStart.x), dy=Math.abs(lpLatest.y-lpStart.y);
+  if((dx>28||dy>28)&&lpTimer){clearTimeout(lpTimer);lpTimer=null;}
+},{passive:true});
+wrap.addEventListener('touchend',()=>{ if(lpTimer){clearTimeout(lpTimer);lpTimer=null;} lpStart=lpLatest=null; });
 
 buildStageSelect();
 </script>
