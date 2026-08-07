@@ -14,11 +14,12 @@
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body {
-  background: #c87828;
+  background: #f5e6ff;
   background-image:
-    repeating-linear-gradient(0deg,  rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 1px,transparent 1px,transparent 26px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0,rgba(0,0,0,.12) 1px,transparent 1px,transparent 26px),
-    repeating-linear-gradient(0deg,  rgba(255,255,255,.06) 0,rgba(255,255,255,.06) 2px,transparent 2px,transparent 26px);
+    radial-gradient(circle, #e8b4ff 1.5px, transparent 1.5px),
+    radial-gradient(circle, #ffb8e8 1px, transparent 1px);
+  background-size: 28px 28px, 14px 14px;
+  background-position: 0 0, 7px 7px;
   font-family:'Bakdahyeon', sans-serif;
   display:flex; flex-direction:column; align-items:center;
   min-height:100vh; padding:10px 6px 24px;
@@ -28,22 +29,23 @@ body {
 /* ══ OUTER FRAME ══ */
 #game-frame {
   width:100%; max-width:760px;
-  background: #e8a840;
+  background: #fff0fb;
   border-radius:16px;
   box-shadow:
-    0 0 0 5px #b87020,
-    0 0 0 9px #f0c060,
-    0 0 0 13px #b87020,
-    0 8px 24px rgba(0,0,0,.5);
+    0 0 0 4px #ff80c8,
+    0 0 0 8px #cc40a0,
+    0 0 0 12px #ff80c8,
+    0 8px 32px rgba(180,0,120,.35),
+    0 0 24px rgba(255,100,200,.3);
   overflow:hidden;
   position:relative;
 }
 
 /* ── LACE TOP ── */
 #lace-top {
-  background:linear-gradient(180deg,#fff8f0,#f5d0b0);
+  background:linear-gradient(180deg,#fff0fb,#ffc8ee);
   width:100%;
-  border-bottom:3px solid #d08040;
+  border-bottom:3px solid #ff80c8;
   display:flex; align-items:center; justify-content:space-between;
   padding:10px 14px 22px; position:relative;
 }
@@ -158,23 +160,28 @@ canvas { display:block; image-rendering:pixelated; }
 }
 .act-btn {
   flex:1; font-family:'Bakdahyeon',sans-serif; font-size:1.1rem;
-  padding:12px 6px; border-radius:12px; border:none; cursor:pointer;
+  padding:12px 6px; border-radius:20px; cursor:pointer;
   letter-spacing:1px;
   transition:transform .08s, box-shadow .08s;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);
 }
 .act-btn:active{ transform:translateY(3px) !important; }
 #btn-reset {
-  background:linear-gradient(180deg,#ffdd44,#e8b820);
-  color:#5a3000; border:2px solid #a07010;
-  box-shadow:0 5px 0 #806010, inset 0 2px 0 rgba(255,255,255,.4);
+  background:linear-gradient(180deg,#ffe066 0%,#ffc400 45%,#cc8800 100%);
+  color:#5a2000; border:2px solid #997000;
+  box-shadow:0 5px 0 #886000, inset 0 2px 0 rgba(255,255,255,.55),
+             0 0 10px rgba(255,200,0,.4);
 }
-#btn-reset:active{ box-shadow:0 2px 0 #806010 !important; }
+#btn-reset:hover{ box-shadow:0 5px 0 #886000, inset 0 2px 0 rgba(255,255,255,.55), 0 0 18px rgba(255,200,0,.6); }
+#btn-reset:active{ box-shadow:0 2px 0 #886000 !important; }
 #btn-done {
-  background:linear-gradient(180deg,#66ccff,#2288e8);
-  color:#fff; border:2px solid #1060b0;
-  box-shadow:0 5px 0 #0848a0, inset 0 2px 0 rgba(255,255,255,.4);
+  background:linear-gradient(180deg,#ff9de2 0%,#ff5cbf 45%,#cc2d96 100%);
+  color:#fff; border:2px solid #aa1a80;
+  box-shadow:0 5px 0 #881060, inset 0 2px 0 rgba(255,255,255,.55),
+             0 0 10px rgba(255,80,190,.4);
 }
-#btn-done:active{ box-shadow:0 2px 0 #0848a0 !important; }
+#btn-done:hover{ box-shadow:0 5px 0 #881060, inset 0 2px 0 rgba(255,255,255,.55), 0 0 18px rgba(255,80,190,.6); }
+#btn-done:active{ box-shadow:0 2px 0 #881060 !important; }
 
 /* ── RIGHT (Info Panel) ── */
 #right-col {
@@ -274,14 +281,15 @@ canvas { display:block; image-rendering:pixelated; }
 /* ══ STAGE SELECT ════════════════════════════════════ */
 #stage-select {
   width:100%; max-width:760px;
-  background:#e8a840;
+  background:#fff0fb;
   border-radius:16px;
-  box-shadow:0 0 0 5px #b87020,0 0 0 9px #f0c060,0 0 0 13px #b87020,0 8px 24px rgba(0,0,0,.5);
+  box-shadow:0 0 0 4px #ff80c8,0 0 0 8px #cc40a0,0 0 0 12px #ff80c8,
+             0 8px 32px rgba(180,0,120,.35),0 0 24px rgba(255,100,200,.3);
   overflow:hidden;
 }
 #ss-header {
-  background:#f5d890;
-  border-bottom:3px solid #d08040;
+  background:linear-gradient(180deg,#fff0fb,#ffc8ee);
+  border-bottom:3px solid #ff80c8;
   display:flex; align-items:center; justify-content:space-between;
   padding:10px 14px 22px; position:relative;
 }
@@ -330,6 +338,11 @@ canvas { display:block; image-rendering:pixelated; }
   transition:transform .08s;
 }
 #btn-menu:active { transform:translateY(2px); box-shadow:0 1px 0 #806010; }
+@keyframes spk{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(0);opacity:0}
+}
+
 .fill-hint {
   font-size:.7rem; color:rgba(180,120,40,.7);
   text-align:center; margin-top:4px; font-family:'Bakdahyeon',sans-serif;
@@ -866,6 +879,7 @@ function initLevel(idx){
     s.classList.toggle('on',i<diff); s.classList.toggle('off',i>=diff);
   });
   buildYarnBalls(); syncUI(); drawTarget(); drawPlayer();
+  autoLoad(); updateProgress();
 }
 
 function updateProgress(){
@@ -911,20 +925,22 @@ function cellFromEvent(e){
   if(r<0||r>=lvl.rows||c<0||c>=lvl.cols) return null;
   return `${r},${c}`;
 }
-function paintAt(key){
+function paintAt(key, clientX, clientY){
   if(!key||key===lastCell) return;
   lastCell=key;
   const [r,c]=key.split(',').map(Number);
   playerGrid[r*lvl.cols+c]=isEraser?0:colorIdx+1;
   updateProgress(); drawPlayer();
+  autoSave();
+  if(clientX!=null) spawnSparkles(clientX, clientY);
 }
 
 const wrap=document.getElementById('canvas-wrap');
-wrap.addEventListener('mousedown',e=>{ painting=true; lastCell=null; paintAt(cellFromEvent(e)); });
-wrap.addEventListener('mousemove',e=>{ if(painting) paintAt(cellFromEvent(e)); });
+wrap.addEventListener('mousedown',e=>{ if(e.button!==0) return; painting=true; lastCell=null; paintAt(cellFromEvent(e),e.clientX,e.clientY); });
+wrap.addEventListener('mousemove',e=>{ if(painting) paintAt(cellFromEvent(e),e.clientX,e.clientY); });
 window.addEventListener('mouseup',()=>{ painting=false; lastCell=null; });
-wrap.addEventListener('touchstart',e=>{ e.preventDefault(); painting=true; lastCell=null; paintAt(cellFromEvent(e.touches[0])); },{passive:false});
-wrap.addEventListener('touchmove',e=>{ e.preventDefault(); if(painting) paintAt(cellFromEvent(e.touches[0])); },{passive:false});
+wrap.addEventListener('touchstart',e=>{ e.preventDefault(); painting=true; lastCell=null; const t=e.touches[0]; paintAt(cellFromEvent(t),t.clientX,t.clientY); },{passive:false});
+wrap.addEventListener('touchmove',e=>{ e.preventDefault(); if(painting){ const t=e.touches[0]; paintAt(cellFromEvent(t),t.clientX,t.clientY); } },{passive:false});
 wrap.addEventListener('touchend',()=>{ painting=false; lastCell=null; });
 
 document.getElementById('eraser-btn').addEventListener('click',()=>{ isEraser=!isEraser; syncUI(); });
@@ -950,7 +966,9 @@ document.getElementById('btn-done').addEventListener('click',()=>{
   totalScore+=score;
   document.getElementById('score-val').textContent=totalScore;
   document.getElementById('match-pct').textContent=score+'%';
-  const stars=score===100?'⭐⭐⭐':score>=80?'⭐⭐':score>=50?'⭐':'';
+  const starCount=score===100?3:score>=80?2:score>=50?1:0;
+  const stars='⭐'.repeat(starCount);
+  saveClear(lvlIdx, starCount);
   const emoji=score===100?'🎉':score>=80?'😊':score>=50?'🙂':'😅';
   const title=score===100?'PERFECT!':score>=80?'GREAT!':score>=50?'NICE!':'다시 도전!';
   document.getElementById('ov-emoji').textContent=emoji;
@@ -970,16 +988,56 @@ document.getElementById('overlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('overlay')) document.getElementById('overlay').classList.remove('show');
 });
 
+// ══ SPARKLE EFFECT ════════════════════════════════════
+const SPARKLE_CHARS=['✦','✧','★','✸','✺','❋'];
+const SPARKLE_COLORS=['#ff69b4','#ffd700','#bf80ff','#00cfff','#ff4da6','#adff2f'];
+function spawnSparkles(clientX, clientY){
+  for(let i=0;i<6;i++){
+    const el=document.createElement('span');
+    el.textContent=SPARKLE_CHARS[Math.floor(Math.random()*SPARKLE_CHARS.length)];
+    const sz=8+Math.random()*10;
+    const angle=Math.random()*Math.PI*2;
+    const dist=20+Math.random()*35;
+    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist-20;
+    el.style.cssText=`position:fixed;left:${clientX}px;top:${clientY}px;color:${SPARKLE_COLORS[Math.floor(Math.random()*SPARKLE_COLORS.length)]};font-size:${sz}px;pointer-events:none;z-index:9999;text-shadow:0 0 6px currentColor;transform:translate(-50%,-50%);animation:spk .65s ease-out forwards;--tx:${tx}px;--ty:${ty}px`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),700);
+  }
+}
+
+// ══ SAVE/LOAD ══════════════════════════════════════════
+const SAVE_KEY='knitpuzzle_save';
+const CLEAR_KEY='knitpuzzle_clears';
+function getClearData(){ try{ return JSON.parse(localStorage.getItem(CLEAR_KEY)||'{}'); }catch(e){return{};} }
+function saveClear(idx, stars){
+  const d=getClearData();
+  if(!d[idx]||d[idx]<stars){ d[idx]=stars; localStorage.setItem(CLEAR_KEY,JSON.stringify(d)); }
+}
+function autoSave(){
+  try{ localStorage.setItem(SAVE_KEY,JSON.stringify({idx:lvlIdx,grid:playerGrid})); }catch(e){}
+}
+function autoLoad(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(d&&d.idx===lvlIdx&&d.grid&&d.grid.length===playerGrid.length){
+      playerGrid=d.grid; drawPlayer(); updateProgress();
+    }
+  }catch(e){}
+}
+
 // ══ STAGE SELECT ══════════════════════════════════════
 function buildStageSelect(){
   const grid=document.getElementById('ss-grid');
   grid.innerHTML='';
   const PSW=8, PSH=9, PVGAP=1;
+  const clears=getClearData();
   LEVELS.forEach((lv,i)=>{
     const card=document.createElement('div');
     card.className='ss-card';
-    const stars='⭐'.repeat(lv.diff)+'☆'.repeat(3-lv.diff);
-    card.innerHTML=`<div class="ss-prev-wrap"><canvas id="ssp-${i}"></canvas></div><div class="ss-name">${lv.name}</div><div class="ss-stars">${stars}</div>`;
+    const diffStars='★'.repeat(lv.diff)+'☆'.repeat(3-lv.diff);
+    const cleared=clears[i]!=null;
+    const clearStars=cleared?'⭐'.repeat(clears[i])+'☆'.repeat(3-clears[i]):'';
+    card.innerHTML=`<div class="ss-prev-wrap"><canvas id="ssp-${i}"></canvas></div><div class="ss-name">${lv.name}</div><div class="ss-stars">${cleared?clearStars:diffStars}</div>`;
     card.addEventListener('click',()=>selectStage(i));
     grid.appendChild(card);
     requestAnimationFrame(()=>{
