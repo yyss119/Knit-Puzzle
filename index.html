@@ -298,47 +298,69 @@ body {
   overflow: hidden;
 }
 
+/* ── 실 볼 + 에라저 공통 ── */
+#yarn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  padding: 6px 8px 4px; /* outline 오버플로우 여백 */
+}
+
 /* 실 볼 */
 .yarn-ball {
-  width: 38px; height: 38px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   cursor: pointer;
   border: 3px solid #1A0010;
-  box-shadow: 2px 2px 0 rgba(0,0,0,.4);
-  transition: transform .1s, box-shadow .1s;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.45);
+  transition: outline .12s, outline-offset .12s;
   position: relative;
+  flex-shrink: 0;
 }
 .yarn-ball::after {
   content: '';
-  position: absolute; top: 4px; left: 5px; right: 10px; height: 32%;
-  background: rgba(255,255,255,.5);
+  position: absolute; top: 4px; left: 4px; right: 9px; height: 32%;
+  background: rgba(255,255,255,.55);
   border-radius: 50%;
   pointer-events: none;
 }
 .yarn-ball.active {
-  transform: scale(1.22) translateY(-4px);
-  box-shadow: 0 0 0 2px #FFD700, 0 0 0 4px #1A0010, 2px 4px 0 #1A0010;
+  outline: 3px solid #FFD700;
+  outline-offset: 3px;
+  box-shadow: 2px 2px 0 #886600, 3px 3px 0 #1A0010;
 }
-.yarn-ball:hover:not(.active) { transform: scale(1.1) translateY(-2px); }
+.yarn-ball:hover:not(.active) {
+  outline: 2px solid rgba(255,215,0,.5);
+  outline-offset: 2px;
+}
 
-/* 지우개 버튼 */
+/* 에라저 — 실뭉치와 동일한 원형 스타일 */
 #eraser-btn {
-  width: 38px; height: 38px; border-radius: 4px;
-  font-family: 'Bakdahyeon', sans-serif; font-size: .9rem;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-family: 'Bakdahyeon', sans-serif; font-size: .88rem;
   cursor: pointer;
   background: #FFFACD;
-  color: #664400; border: 3px solid #1A0010;
+  color: #664400;
+  border: 3px solid #1A0010;
   box-shadow: 2px 2px 0 #886600, 3px 3px 0 #1A0010;
-  transition: transform .06s, box-shadow .06s;
+  transition: outline .12s, outline-offset .12s, background .12s;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
 }
 #eraser-btn.active {
   background: #FFD700; color: #1A0010;
-  transform: translate(2px,2px);
-  box-shadow: 0 0 0 #886600, 1px 1px 0 #1A0010;
+  outline: 3px solid #FF69B4;
+  outline-offset: 3px;
+  box-shadow: 2px 2px 0 #CC0055, 3px 3px 0 #1A0010;
 }
-#eraser-btn:hover:not(.active) { filter: brightness(1.08); }
-
-#yarn-row { display: flex; gap: 7px; margin-top: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+#eraser-btn:hover:not(.active) {
+  outline: 2px solid rgba(255,105,180,.5);
+  outline-offset: 2px;
+}
 
 /* 색상 스트립 */
 #color-strip {
@@ -818,12 +840,14 @@ body {
 
   #yarn-row {
     flex-shrink: 0; flex-wrap: nowrap;
-    gap: 5px; margin-top: 4px; padding: 0 2px;
+    gap: 5px; margin-top: 2px; padding: 4px 6px 2px;
     overflow-x: auto; -webkit-overflow-scrolling: touch;
-    max-width: 100%;
+    max-width: 100%; justify-content: flex-start;
   }
-  .yarn-ball, #eraser-btn { width: 32px; height: 32px; flex-shrink: 0; }
-  #eraser-btn { font-size: .82rem; }
+  .yarn-ball, #eraser-btn { width: 30px; height: 30px; }
+  #eraser-btn { font-size: .76rem; border-radius: 50%; }
+  /* outline이 잘리지 않도록 yarn-row에 여백 */
+  #yarn-row { padding: 5px 6px 3px; gap: 5px; }
 
   #color-strip {
     flex-shrink: 0; height: 22px; font-size: .68rem;
