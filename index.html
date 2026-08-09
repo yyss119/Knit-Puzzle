@@ -419,13 +419,87 @@ canvas { display:block; image-rendering:pixelated; }
   #ov-emoji { font-size: 2.6rem; }
   #ov-title { font-size: 1.1rem; }
 }
+
+/* ══ UPGRADE: 셀 팝 애니메이션 ══ */
+@keyframes cellPopAnim {
+  0%   { outline: 3px solid rgba(255,220,80,0.9); outline-offset: 0px; }
+  60%  { outline: 5px solid rgba(255,180,40,0.5); outline-offset: 2px; }
+  100% { outline: 0px solid rgba(255,180,40,0);   outline-offset: 4px; }
+}
+.cell-pop-marker {
+  position: absolute;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: cellPopAnim 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  z-index: 200;
+}
+
+/* ══ UPGRADE: 힌트 하이라이트 ══ */
+@keyframes hintPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.8); }
+  50%     { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+}
+.hint-overlay {
+  position: absolute;
+  border-radius: 2px;
+  border: 2px solid gold;
+  pointer-events: none;
+  animation: hintPulse 0.6s ease 3;
+  z-index: 201;
+  background: rgba(255,215,0,0.15);
+}
+
+/* ══ UPGRADE: 힌트 버튼 ══ */
+#hint-row {
+  display: flex; gap: 8px; margin-top: 8px;
+  width: 100%; max-width: 320px; justify-content: center;
+}
+#btn-hint {
+  font-family: 'Bakdahyeon', sans-serif; font-size: 1rem;
+  padding: 9px 18px; border-radius: 16px; cursor: pointer;
+  background: linear-gradient(180deg, #a8e6cf 0%, #68c9a0 45%, #38a070 100%);
+  color: #fff; border: 2px solid #287850;
+  box-shadow: 0 4px 0 #1a5c38, inset 0 2px 0 rgba(255,255,255,0.5);
+  transition: transform .08s;
+  letter-spacing: 1px;
+}
+#btn-hint:hover { filter: brightness(1.08); }
+#btn-hint:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a5c38 !important; }
+#btn-hint:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ══ UPGRADE: 사운드 토글 ══ */
+#sound-toggle {
+  position: absolute; top: 10px; right: 14px;
+  font-size: 1.3rem; background: none; border: none;
+  cursor: pointer; z-index: 10; opacity: 0.75;
+  transition: opacity .15s, transform .1s;
+  line-height: 1;
+}
+#sound-toggle:hover { opacity: 1; transform: scale(1.15); }
+
+/* ══ UPGRADE: 완성 컨페티 캔버스 ══ */
+#confetti-canvas {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+}
+
+/* ══ UPGRADE: 스테이지 셀렉트 사운드 토글 ══ */
+#ss-sound-toggle {
+  position: absolute; top: 10px; right: 14px;
+  font-size: 1.3rem; background: none; border: none;
+  cursor: pointer; z-index: 10; opacity: 0.75;
+  transition: opacity .15s, transform .1s;
+}
+#ss-sound-toggle:hover { opacity: 1; transform: scale(1.15); }
+
 </style>
 </head>
 <body>
+<canvas id="confetti-canvas"></canvas>
 
 <!-- STAGE SELECT -->
 <div id="stage-select">
-  <div id="ss-header">
+  <div id="ss-header"><button id="ss-sound-toggle" title="사운드 켜기/끄기">🔊</button>
     <span class="bow">🎀</span>
     <div id="ss-title">🧶 니트 퍼즐</div>
     <span class="bow">🎀</span>
@@ -436,7 +510,7 @@ canvas { display:block; image-rendering:pixelated; }
 <div id="game-frame" style="display:none">
 
   <!-- LACE TOP -->
-  <div id="lace-top">
+  <div id="lace-top"><button id="sound-toggle" title="사운드 켜기/끄기">🔊</button>
     <span class="bow">🎀</span>
     <div id="lace-title">🧶 니트 퍼즐</div>
     <span class="bow">🎀</span>
@@ -466,6 +540,9 @@ canvas { display:block; image-rendering:pixelated; }
         <button class="act-btn" id="btn-done">✓ 완성!</button>
       </div>
       <div class="fill-hint">우클릭 가로드래그 → 행 채우기 · 세로드래그 → 열 채우기</div>
+      <div id="hint-row">
+        <button id="btn-hint">💡 힌트 (<span id="hint-count">3</span>)</button>
+      </div>
       <div style="text-align:center;margin-top:8px">
         <button id="btn-menu">☰ 패턴 목록</button>
       </div>
@@ -879,6 +956,11 @@ function initLevel(idx){
     s.classList.toggle('on',i<diff); s.classList.toggle('off',i>=diff);
   });
   buildYarnBalls(); syncUI(); drawTarget(); drawPlayer();
+  // 힌트 리셋
+  hintsLeft = 3;
+  const hintBtn = document.getElementById('btn-hint');
+  if (hintBtn) { hintBtn.disabled = false; document.getElementById('hint-count').textContent = 3; }
+  clearHintOverlays();
   autoLoad(); updateProgress();
 }
 
@@ -932,6 +1014,8 @@ function paintAt(key, clientX, clientY){
   playerGrid[r*lvl.cols+c]=isEraser?0:colorIdx+1;
   updateProgress(); drawPlayer();
   autoSave();
+  if(isEraser) AudioFX.erase(); else AudioFX.pop();
+  spawnCellPop(c, r);
   if(clientX!=null) spawnSparkles(clientX, clientY);
 }
 
@@ -976,6 +1060,7 @@ document.getElementById('btn-done').addEventListener('click',()=>{
   document.getElementById('ov-sub').textContent=`${score}% 맞췄어요`;
   document.getElementById('ov-stars').textContent=stars;
   document.getElementById('ov-score').textContent=score+'pt';
+  if(score===100){ launchConfetti(); AudioFX.complete(); } else { AudioFX.select(); }
   const isLast=lvlIdx>=LEVELS.length-1;
   document.getElementById('ov-btn').textContent=(isLast&&score===100)?'🏆 전체 클리어!':score>=50?'다음 레벨 ▶':'✕ 닫기';
   document.getElementById('overlay').classList.add('show');
@@ -1113,6 +1198,188 @@ wrap.addEventListener('touchmove',e=>{
   if((dx>28||dy>28)&&lpTimer){clearTimeout(lpTimer);lpTimer=null;}
 },{passive:true});
 wrap.addEventListener('touchend',()=>{ if(lpTimer){clearTimeout(lpTimer);lpTimer=null;} lpStart=lpLatest=null; });
+
+
+// ══════════════════════════════════════════════════
+//  UPGRADE: 사운드 시스템 (Web Audio API)
+// ══════════════════════════════════════════════════
+let soundEnabled = (() => {
+  try { return localStorage.getItem('knitSound') !== 'off'; } catch(e) { return true; }
+})();
+
+function updateSoundBtns() {
+  const icon = soundEnabled ? '🔊' : '🔇';
+  const st = document.getElementById('sound-toggle');
+  const ss = document.getElementById('ss-sound-toggle');
+  if (st) st.textContent = icon;
+  if (ss) ss.textContent = icon;
+}
+updateSoundBtns();
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  try { localStorage.setItem('knitSound', soundEnabled ? 'on' : 'off'); } catch(e) {}
+  updateSoundBtns();
+}
+document.getElementById('sound-toggle').addEventListener('click', toggleSound);
+document.getElementById('ss-sound-toggle').addEventListener('click', toggleSound);
+
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+const AudioFX = {
+  _play(freq, type, duration, vol = 0.25, delay = 0) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration);
+    } catch(e) {}
+  },
+  pop()    { this._play(520 + Math.random()*80, 'sine', 0.07, 0.18); },
+  erase()  { this._play(280, 'triangle', 0.06, 0.12); },
+  select() { this._play(660, 'triangle', 0.06, 0.14); },
+  hint()   { this._play(880, 'sine', 0.12, 0.2); setTimeout(() => this._play(1100,'sine',0.12,0.18), 100); },
+  error()  { this._play(160, 'sawtooth', 0.12, 0.15); },
+  complete() {
+    if (!soundEnabled) return;
+    [523, 659, 784, 1047].forEach((f, i) => {
+      setTimeout(() => this._play(f, 'sine', 0.35, 0.38), i * 110);
+    });
+  },
+};
+
+// ══════════════════════════════════════════════════
+//  UPGRADE: 셀 팝 오버레이 애니메이션
+// ══════════════════════════════════════════════════
+function spawnCellPop(col, row) {
+  const canvasRect = pC.getBoundingClientRect();
+  const scaleX = canvasRect.width / pC.width;
+  const scaleY = canvasRect.height / pC.height;
+  const x = col * SW * scaleX + canvasRect.left + window.scrollX;
+  const y = (VGAP + row * (SH + VGAP)) * scaleY + canvasRect.top + window.scrollY;
+  const w = SW * scaleX;
+  const h = SH * scaleY;
+  const el = document.createElement('div');
+  el.className = 'cell-pop-marker';
+  el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 300);
+}
+
+// ══════════════════════════════════════════════════
+//  UPGRADE: 힌트 시스템
+// ══════════════════════════════════════════════════
+let hintsLeft = 3;
+let hintOverlays = [];
+
+function clearHintOverlays() {
+  hintOverlays.forEach(el => el.remove());
+  hintOverlays = [];
+}
+
+function useHint() {
+  if (hintsLeft <= 0) { AudioFX.error(); return; }
+  const flat = lvl.grid.flat();
+  const wrong = [];
+  for (let i = 0; i < flat.length; i++) {
+    if (playerGrid[i] !== flat[i]) wrong.push(i);
+  }
+  if (wrong.length === 0) return;
+
+  // 랜덤 틀린 셀 1개 표시
+  const idx = wrong[Math.floor(Math.random() * Math.min(wrong.length, 5))];
+  const row = Math.floor(idx / lvl.cols);
+  const col = idx % lvl.cols;
+
+  const canvasRect = pC.getBoundingClientRect();
+  const scaleX = canvasRect.width / pC.width;
+  const scaleY = canvasRect.height / pC.height;
+  const x = col * SW * scaleX + canvasRect.left + window.scrollX;
+  const y = (VGAP + row * (SH + VGAP)) * scaleY + canvasRect.top + window.scrollY;
+  const w = SW * scaleX;
+  const h = SH * scaleY;
+
+  clearHintOverlays();
+  const el = document.createElement('div');
+  el.className = 'hint-overlay';
+  el.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;position:fixed;`;
+  el.style.left = (col * SW * scaleX + canvasRect.left) + 'px';
+  el.style.top  = (VGAP + row * (SH + VGAP)) * scaleY + canvasRect.top + 'px';
+  document.body.appendChild(el);
+  hintOverlays.push(el);
+  setTimeout(() => clearHintOverlays(), 2200);
+
+  hintsLeft--;
+  document.getElementById('hint-count').textContent = hintsLeft;
+  if (hintsLeft <= 0) document.getElementById('btn-hint').disabled = true;
+  AudioFX.hint();
+}
+
+document.getElementById('btn-hint').addEventListener('click', useHint);
+
+// ══════════════════════════════════════════════════
+//  UPGRADE: 컨페티 완성 이펙트
+// ══════════════════════════════════════════════════
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#ff69b4','#ffd700','#bf80ff','#00cfff','#ff4da6','#adff2f','#ffb347','#98ff98'];
+  const particles = Array.from({length: 100}, () => ({
+    x: Math.random() * canvas.width,
+    y: -15 - Math.random() * 40,
+    vx: (Math.random() - 0.5) * 5,
+    vy: 2.5 + Math.random() * 3.5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    size: 5 + Math.random() * 8,
+    rotation: Math.random() * 360,
+    rotSpeed: (Math.random() - 0.5) * 10,
+    shape: Math.random() > 0.5 ? 'rect' : 'circle',
+  }));
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rotation += p.rotSpeed;
+      p.vx *= 0.99;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - frame / 100);
+      if (p.shape === 'rect') ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size * 0.6);
+      else { ctx.beginPath(); ctx.arc(0, 0, p.size/2, 0, Math.PI*2); ctx.fill(); }
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 130) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  animate();
+}
+
+// 숫자 키 단축키: 1~4로 색상 선택, E=지우개
+document.addEventListener('keydown', e => {
+  const n = parseInt(e.key);
+  if (!isNaN(n) && n >= 1 && n <= (lvl ? lvl.colors.length : 0)) {
+    colorIdx = n - 1; isEraser = false; syncUI(); AudioFX.select();
+  }
+  if (e.key.toLowerCase() === 'e') { isEraser = !isEraser; syncUI(); }
+  if (e.key.toLowerCase() === 'h') useHint();
+});
 
 buildStageSelect();
 </script>
