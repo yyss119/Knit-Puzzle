@@ -306,7 +306,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-wrap: nowrap;
-  padding: 6px 8px 4px; /* outline 오버플로우 여백 */
+  padding: 6px 8px 20px; /* outline + ▼ 화살표 여백 */
 }
 
 /* 실 볼 */
@@ -328,13 +328,23 @@ body {
   pointer-events: none;
 }
 .yarn-ball.active {
-  outline: 3px solid #FFD700;
-  outline-offset: 3px;
-  box-shadow: 2px 2px 0 #886600, 3px 3px 0 #1A0010;
+  outline: 4px solid #FFD700;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 8px rgba(255,215,0,.25), 2px 2px 0 #886600, 3px 3px 0 #1A0010;
+  position: relative; z-index: 2;
+}
+.yarn-ball.active::before {
+  content: '▼';
+  position: absolute; bottom: -18px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; color: #FFD700;
+  text-shadow: 0 1px 0 #886600, 0 2px 0 #1A0010;
+  pointer-events: none;
+  line-height: 1;
 }
 .yarn-ball:hover:not(.active) {
-  outline: 2px solid rgba(255,215,0,.5);
-  outline-offset: 2px;
+  outline: 2px solid rgba(255,215,0,.6);
+  outline-offset: 3px;
 }
 
 /* 에라저 — 실뭉치와 동일한 원형 스타일 */
@@ -353,25 +363,17 @@ body {
 }
 #eraser-btn.active {
   background: #FFD700; color: #1A0010;
-  outline: 3px solid #FF69B4;
-  outline-offset: 3px;
-  box-shadow: 2px 2px 0 #CC0055, 3px 3px 0 #1A0010;
+  outline: 4px solid #FF69B4;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 8px rgba(255,105,180,.25), 2px 2px 0 #CC0055, 3px 3px 0 #1A0010;
+  position: relative; z-index: 2;
 }
 #eraser-btn:hover:not(.active) {
   outline: 2px solid rgba(255,105,180,.5);
   outline-offset: 2px;
 }
 
-/* 색상 스트립 */
-#color-strip {
-  margin-top: 7px; border-radius: 2px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: .8rem; letter-spacing: 1px;
-  padding: 0 14px; min-width: 130px;
-  border: 2px solid #1A0010;
-  box-shadow: 2px 2px 0 #1A0010;
-  transition: background .2s;
-}
+
 
 /* ── 컨트롤 2×2 그리드 ── */
 .controls-grid {
@@ -849,11 +851,7 @@ body {
   /* outline이 잘리지 않도록 yarn-row에 여백 */
   #yarn-row { padding: 5px 6px 3px; gap: 5px; }
 
-  #color-strip {
-    flex-shrink: 0; height: 22px; font-size: .68rem;
-    margin-top: 3px; min-width: 110px; padding: 0 8px;
-    box-shadow: 1px 1px 0 #1A0010;
-  }
+
 
   /* 모바일: controls-grid 2열 유지하되 컴팩트하게 */
   .controls-grid {
@@ -1005,8 +1003,6 @@ body {
         <button id="eraser-btn" title="지우개">✕</button>
       </div>
 
-      <!-- Color strip -->
-      <div id="color-strip">실 1 선택됨</div>
 
       <!-- Buttons -->
       <div class="controls-grid">
@@ -1491,17 +1487,7 @@ function buildYarnBalls(){
 function syncUI(){
   document.querySelectorAll('.yarn-ball').forEach(b=>b.classList.toggle('active',!isEraser&&+b.dataset.i===colorIdx));
   document.getElementById('eraser-btn').classList.toggle('active',isEraser);
-  const strip=document.getElementById('color-strip');
-  if(isEraser){
-    strip.style.background='#fffce0'; strip.style.color='#5a3000';
-    strip.textContent='✕ 지우개 선택됨';
-  } else {
-    const hex=lvl.colors[colorIdx];
-    strip.style.background=hex;
-    const [r,g,b]=hexRGB(hex);
-    strip.style.color=(r*.299+g*.587+b*.114)>140?'#2a1008':'#fff';
-    strip.textContent=`실 ${colorIdx+1} 선택됨`;
-  }
+
 }
 
 // ── Mouse/Touch ──
