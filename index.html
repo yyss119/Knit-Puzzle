@@ -351,56 +351,79 @@ body {
   transition: background .2s;
 }
 
-/* 액션 버튼들 */
-#action-row {
-  display: flex; gap: 8px; margin-top: 8px;
-  justify-content: center;
+/* ── 컨트롤 2×2 그리드 ── */
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 7px;
+  width: 100%; max-width: 260px;
+  margin-top: 8px;
 }
-.act-btn {
+/* action-row, hint-row, menu-row → display:contents로 자식이 직접 그리드 참여 */
+#action-row { display: contents; }
+#hint-row   { display: contents; }
+#menu-row   { display: contents; }
+
+/* fill-hint: 하단 전체 열 */
+.fill-hint {
+  grid-column: 1 / -1;
+  font-size: .64rem; color: #CC6699; text-align: center; letter-spacing: .3px;
+  padding-top: 2px;
+}
+
+/* 공통 버튼 베이스 */
+.act-btn, #btn-hint, #btn-menu {
   font-family: 'Bakdahyeon', sans-serif;
-  font-size: .88rem; letter-spacing: 1px;
-  padding: 9px 16px; border-radius: 4px; cursor: pointer;
-  background: #E8B4FF;
-  color: #3D006B; border: 2px solid #1A0010;
-  box-shadow: 3px 3px 0 #7B007B, 4px 4px 0 #1A0010;
+  width: 100%; border-radius: 4px; cursor: pointer;
+  border: 2px solid #1A0010;
   transition: transform .06s, box-shadow .06s;
+  letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.act-btn:active, #btn-hint:active, #btn-menu:active {
+  transform: translate(3px, 3px);
+}
+
+/* 초기화 버튼 — 라벤더 */
+.act-btn {
+  font-size: .88rem;
+  padding: 11px 8px;
+  background: #E8B4FF;
+  color: #3D006B;
+  box-shadow: 3px 3px 0 #7B007B, 4px 4px 0 #1A0010;
   text-shadow: 1px 1px 0 rgba(255,255,255,.4);
 }
-.act-btn:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 #7B007B, 1px 1px 0 #1A0010;
-}
+.act-btn:active { box-shadow: 0 0 0 #7B007B, 1px 1px 0 #1A0010; }
 .act-btn:hover  { filter: brightness(1.06); }
 
-/* 힌트 버튼 */
-#hint-row { margin-top: 7px; }
-#btn-hint {
-  font-family: 'Bakdahyeon', sans-serif;
-  font-size: .85rem; letter-spacing: 1px; padding: 8px 18px;
-  border-radius: 4px; cursor: pointer;
-  background: #FFD700;
-  color: #553300; border: 2px solid #1A0010;
-  box-shadow: 3px 3px 0 #886600, 4px 4px 0 #1A0010;
-  transition: transform .06s, box-shadow .06s;
-  display: flex; align-items: center; gap: 4px;
+/* 완성 버튼 — 핫핑크 */
+#btn-done {
+  background: #FF69B4;
+  color: #FFF0F8;
+  box-shadow: 3px 3px 0 #CC0055, 4px 4px 0 #1A0010;
+  text-shadow: 1px 1px 0 #1A0010;
 }
-#btn-hint:active  { transform: translate(3px,3px); box-shadow: 0 0 0 #886600, 1px 1px 0 #1A0010; }
+#btn-done:active { box-shadow: 0 0 0 #CC0055, 1px 1px 0 #1A0010; }
+
+/* 힌트 버튼 — 골드 */
+#btn-hint {
+  font-size: .85rem; padding: 11px 8px;
+  background: #FFD700;
+  color: #553300;
+  box-shadow: 3px 3px 0 #886600, 4px 4px 0 #1A0010;
+}
+#btn-hint:active  { box-shadow: 0 0 0 #886600, 1px 1px 0 #1A0010; }
 #btn-hint:disabled { opacity: .4; cursor: default; transform: none !important; }
 
+/* 패턴목록 버튼 — 민트 */
 #btn-menu {
-  font-family: 'Bakdahyeon', sans-serif;
-  font-size: .82rem; padding: 7px 16px; border-radius: 4px; cursor: pointer;
+  font-size: .85rem; padding: 11px 8px;
   background: #98FFD4;
-  color: #004433; border: 2px solid #1A0010;
+  color: #004433;
   box-shadow: 3px 3px 0 #006644, 4px 4px 0 #1A0010;
-  transition: transform .06s, box-shadow .06s;
 }
-#btn-menu:active { transform: translate(3px,3px); box-shadow: 0 0 0 #006644, 1px 1px 0 #1A0010; }
-
-.fill-hint {
-  font-size: .68rem; color: #CC6699; margin-top: 5px; text-align: center;
-  letter-spacing: .3px;
-}
+#btn-menu:active { box-shadow: 0 0 0 #006644, 1px 1px 0 #1A0010; }
 
 /* ── 오른쪽 정보 ── */
 #right-col {
@@ -748,17 +771,23 @@ body {
     box-shadow: 1px 1px 0 #1A0010;
   }
 
-  #action-row { flex-shrink: 0; gap: 5px; margin-top: 4px; flex-wrap: nowrap; }
-  .act-btn { font-size: .76rem; padding: 6px 10px; box-shadow: 2px 2px 0 #7B007B, 3px 3px 0 #1A0010; }
-  .act-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0 #7B007B, 1px 1px 0 #1A0010; }
-
-  #hint-row { flex-shrink: 0; margin-top: 3px; }
-  #btn-hint { padding: 6px 12px; font-size: .74rem; box-shadow: 2px 2px 0 #886600, 3px 3px 0 #1A0010; }
-  #btn-hint:active { transform: translate(2px,2px); box-shadow: 0 0 0 #886600, 1px 1px 0 #1A0010; }
-
-  div[style*="margin-top:8px"] { margin-top: 3px !important; }
-  #btn-menu { padding: 5px 12px; font-size: .74rem; box-shadow: 2px 2px 0 #006644, 3px 3px 0 #1A0010; }
-  #btn-menu:active { transform: translate(2px,2px); box-shadow: 0 0 0 #006644, 1px 1px 0 #1A0010; }
+  /* 모바일: controls-grid 2열 유지하되 컴팩트하게 */
+  .controls-grid {
+    max-width: calc(100vw - 16px);
+    gap: 5px; margin-top: 4px;
+  }
+  .act-btn, #btn-hint, #btn-menu {
+    font-size: .74rem; padding: 9px 4px;
+    box-shadow: 2px 2px 0 #7B007B, 3px 3px 0 #1A0010;
+  }
+  #btn-done { box-shadow: 2px 2px 0 #CC0055, 3px 3px 0 #1A0010; }
+  #btn-hint { box-shadow: 2px 2px 0 #886600, 3px 3px 0 #1A0010; }
+  #btn-menu { box-shadow: 2px 2px 0 #006644, 3px 3px 0 #1A0010; }
+  .act-btn:active, #btn-hint:active, #btn-menu:active {
+    transform: translate(2px,2px);
+    box-shadow: 0 0 0 transparent, 1px 1px 0 #1A0010;
+  }
+  .fill-hint { display: block; font-size: .6rem; }
 
   #overlay { padding: 16px; }
   #ov-box { padding: 20px 18px 24px; box-shadow: 4px 4px 0 #660022, 6px 6px 0 #1A0010; }
@@ -896,16 +925,18 @@ body {
       <div id="color-strip">실 1 선택됨</div>
 
       <!-- Buttons -->
-      <div id="action-row">
-        <button class="act-btn" id="btn-reset">↺ 초기화</button>
-        <button class="act-btn" id="btn-done">✓ 완성!</button>
-      </div>
-      <div class="fill-hint">우클릭 가로드래그 → 행 채우기 · 세로드래그 → 열 채우기</div>
-      <div id="hint-row">
-        <button id="btn-hint">💡 힌트 (<span id="hint-count">3</span>)</button>
-      </div>
-      <div style="text-align:center;margin-top:8px">
-        <button id="btn-menu">☰ 패턴 목록</button>
+      <div class="controls-grid">
+        <div id="action-row">
+          <button class="act-btn" id="btn-reset">↺ 초기화</button>
+          <button class="act-btn" id="btn-done">✓ 완성!</button>
+        </div>
+        <div id="hint-row">
+          <button id="btn-hint">💡 힌트 (<span id="hint-count">3</span>)</button>
+        </div>
+        <div id="menu-row">
+          <button id="btn-menu">☰ 패턴 목록</button>
+        </div>
+        <div class="fill-hint">PC: 우클릭 드래그 → 행/열 채우기</div>
       </div>
     </div>
 
