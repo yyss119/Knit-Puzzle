@@ -492,14 +492,332 @@ canvas { display:block; image-rendering:pixelated; }
 }
 #ss-sound-toggle:hover { opacity: 1; transform: scale(1.15); }
 
+
+/* ══════════════════════════════════════════════════
+   홈 화면
+══════════════════════════════════════════════════ */
+#home-screen {
+  width: 100%; max-width: 760px;
+  background: #fff0fb;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 4px #ff80c8,
+    0 0 0 8px #cc40a0,
+    0 0 0 12px #ff80c8,
+    0 8px 32px rgba(180,0,120,.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 상단 장식 헤더 */
+#home-header {
+  width: 100%;
+  background: linear-gradient(180deg, #fff0fb, #ffc8ee);
+  border-bottom: 3px solid #ff80c8;
+  padding: 18px 14px 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+#home-header::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 14px;
+  background:
+    radial-gradient(circle at 50% 0%, #fff8f0 9px, transparent 9px),
+    radial-gradient(circle at 50% 0%, #f5d0b0 12px, transparent 12px);
+  background-size: 26px 14px;
+  pointer-events: none;
+}
+
+/* 타이틀 애니메이션 */
+@keyframes titleBounce {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes titleFadeIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+#home-logo {
+  font-size: 3.5rem;
+  animation: titleBounce 2.4s ease-in-out infinite, titleFadeIn 0.6s ease forwards;
+  filter: drop-shadow(0 4px 8px rgba(180,0,120,0.3));
+  line-height: 1;
+}
+#home-title {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 2rem;
+  color: #b83060;
+  text-shadow: 2px 2px 0 rgba(255,255,255,.7), 3px 4px 0 rgba(184,48,96,.25);
+  letter-spacing: 4px;
+  animation: titleFadeIn 0.7s 0.1s ease both;
+}
+#home-subtitle {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 0.85rem;
+  color: #d06090;
+  letter-spacing: 2px;
+  animation: titleFadeIn 0.7s 0.2s ease both;
+}
+
+/* 메인 버튼 영역 */
+#home-body {
+  width: 100%;
+  background: linear-gradient(180deg, #f5e8c8 0%, #ead8b0 100%);
+  padding: 32px 24px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 게임 시작 버튼 */
+#btn-home-start {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+  padding: 18px 0;
+  width: 100%; max-width: 300px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, #ff9de2 0%, #ff5cbf 45%, #cc2d96 100%);
+  color: #fff;
+  border: 3px solid #aa1a80;
+  box-shadow: 0 7px 0 #881060, inset 0 2px 0 rgba(255,255,255,.55), 0 0 20px rgba(255,80,190,.4);
+  transition: transform .1s, box-shadow .1s;
+  animation: titleFadeIn 0.6s 0.3s ease both;
+}
+#btn-home-start:hover  { filter: brightness(1.07); }
+#btn-home-start:active { transform: translateY(5px); box-shadow: 0 2px 0 #881060 !important; }
+
+/* 게임 방법 버튼 */
+#btn-home-how {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  padding: 13px 0;
+  width: 100%; max-width: 300px;
+  border-radius: 20px;
+  cursor: pointer;
+  background: linear-gradient(180deg, #ffe066 0%, #ffc400 45%, #cc8800 100%);
+  color: #5a2000;
+  border: 3px solid #997000;
+  box-shadow: 0 5px 0 #886000, inset 0 2px 0 rgba(255,255,255,.55);
+  transition: transform .1s, box-shadow .1s;
+  animation: titleFadeIn 0.6s 0.4s ease both;
+}
+#btn-home-how:hover  { filter: brightness(1.07); }
+#btn-home-how:active { transform: translateY(4px); box-shadow: 0 1px 0 #886000 !important; }
+
+/* 장식 실 뭉치 */
+#home-deco {
+  display: flex; gap: 16px; margin-top: 6px;
+  font-size: 2rem;
+  animation: titleFadeIn 0.6s 0.5s ease both;
+}
+
+/* ══════════════════════════════════════════════════
+   게임 방법 모달
+══════════════════════════════════════════════════ */
+#how-modal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.78);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+#how-modal.show { display: flex; }
+
+#how-box {
+  background: linear-gradient(180deg, #fff0fb, #ffe0f4);
+  border: 4px solid #cc40a0;
+  border-radius: 20px;
+  box-shadow: 0 8px 0 #881060, 0 16px 40px rgba(0,0,0,.4), inset 0 3px 0 rgba(255,255,255,.5);
+  padding: 28px 28px 32px;
+  max-width: 380px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: pop .22s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+#how-title {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 1.3rem;
+  color: #b83060;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 1px 2px 0 rgba(255,255,255,.7);
+  letter-spacing: 2px;
+}
+
+.how-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.55);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 2px solid rgba(200,80,160,.2);
+}
+.how-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+.how-text {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 0.85rem;
+  color: #5a2040;
+  line-height: 1.7;
+}
+.how-text strong {
+  color: #b83060;
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+#how-close {
+  font-family: 'Bakdahyeon', sans-serif;
+  font-size: 1.05rem;
+  padding: 12px 0;
+  width: 100%;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  background: linear-gradient(180deg, #ff9de2, #ff5cbf);
+  color: #fff;
+  border: 3px solid #aa1a80;
+  box-shadow: 0 4px 0 #881060;
+  transition: transform .1s;
+  letter-spacing: 2px;
+}
+#how-close:active { transform: translateY(3px); box-shadow: 0 1px 0 #881060; }
+
+/* 뒤로가기 버튼 (스테이지 선택 화면에서) */
+#btn-back-home {
+  font-family: 'Bakdahyeon', sans-serif; font-size: .85rem;
+  padding: 6px 14px; border-radius: 8px;
+  border: 2px solid #a07010;
+  background: linear-gradient(180deg, #ffdd44, #e8b820);
+  color: #5a3000; cursor: pointer;
+  box-shadow: 0 3px 0 #806010;
+  transition: transform .08s;
+  margin-right: 6px;
+}
+#btn-back-home:active { transform: translateY(2px); box-shadow: 0 1px 0 #806010; }
+
+@media (max-width: 480px) {
+  #home-logo  { font-size: 2.8rem; }
+  #home-title { font-size: 1.6rem; letter-spacing: 2px; }
+  #home-body  { padding: 24px 16px 28px; }
+  #btn-home-start { font-size: 1.2rem; padding: 16px 0; }
+}
+
 </style>
 </head>
 <body>
 <canvas id="confetti-canvas"></canvas>
 
+<!-- ══ 홈 화면 ══ -->
+<div id="home-screen">
+  <div id="home-header">
+    <div id="home-logo">🧶</div>
+    <div id="home-title">니트 퍼즐</div>
+    <div id="home-subtitle">✦ 뜨개질 도트 퍼즐 ✦</div>
+  </div>
+  <div id="home-body">
+    <button id="btn-home-start">🎮 게임 시작</button>
+    <button id="btn-home-how">📖 게임 방법</button>
+    <div id="home-deco">🎀 🧵 🎀</div>
+  </div>
+</div>
+
+<!-- ══ 게임 방법 모달 ══ -->
+<div id="how-modal">
+  <div id="how-box">
+    <div id="how-title">🧶 게임 방법</div>
+
+    <div class="how-item">
+      <div class="how-icon">🎯</div>
+      <div class="how-text">
+        <strong>목표</strong>
+        오른쪽 <b>목표 패턴</b>을 보고<br>
+        왼쪽 캔버스에 똑같이 색칠해요!
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">🖌️</div>
+      <div class="how-text">
+        <strong>색칠하기</strong>
+        아래 <b>털실 뭉치</b>를 눌러 색상 선택 →<br>
+        캔버스를 <b>클릭하거나 드래그</b>해서 칸을 채워요
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">📏</div>
+      <div class="how-text">
+        <strong>줄 전체 채우기</strong>
+        PC: <b>우클릭 후 드래그</b> (가로→행, 세로→열)<br>
+        모바일: <b>꾹 누른 후 드래그</b>
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">✕</div>
+      <div class="how-text">
+        <strong>지우개</strong>
+        <b>✕ 버튼</b> 또는 <b>E 키</b>를 눌러<br>
+        잘못 칠한 칸을 지울 수 있어요
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">💡</div>
+      <div class="how-text">
+        <strong>힌트</strong>
+        레벨당 <b>3번</b> 사용 가능!<br>
+        틀린 칸 하나를 금색으로 알려줘요
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">✓</div>
+      <div class="how-text">
+        <strong>완성 확인</strong>
+        다 칠했으면 <b>✓ 완성! 버튼</b>을 눌러요<br>
+        100% 맞추면 🎊 컨페티와 함께 퍼펙트!
+      </div>
+    </div>
+
+    <div class="how-item">
+      <div class="how-icon">⌨️</div>
+      <div class="how-text">
+        <strong>키보드 단축키 (PC)</strong>
+        <b>1~4</b> 색상 선택 · <b>E</b> 지우개<br>
+        <b>H</b> 힌트 · <b>스페이스</b> 다음 색상
+      </div>
+    </div>
+
+    <button id="how-close">확인!</button>
+  </div>
+</div>
+
+
 <!-- STAGE SELECT -->
-<div id="stage-select">
-  <div id="ss-header"><button id="ss-sound-toggle" title="사운드 켜기/끄기">🔊</button>
+<div id="stage-select" style="display:none">
+  <div id="ss-header"><button id="btn-back-home">← 홈</button><button id="ss-sound-toggle" title="사운드 켜기/끄기">🔊</button>
     <span class="bow">🎀</span>
     <div id="ss-title">🧶 니트 퍼즐</div>
     <span class="bow">🎀</span>
@@ -1381,7 +1699,53 @@ document.addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'h') useHint();
 });
 
-buildStageSelect();
+
+// ══════════════════════════════════════════════════
+//  홈 화면 로직
+// ══════════════════════════════════════════════════
+function showHome() {
+  document.getElementById('home-screen').style.display = '';
+  document.getElementById('stage-select').style.display = 'none';
+  document.getElementById('game-frame').style.display = 'none';
+}
+
+function showStageSelectFromHome() {
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('stage-select').style.display = '';
+  document.getElementById('game-frame').style.display = 'none';
+  buildStageSelect();
+}
+
+// 게임 시작 버튼
+document.getElementById('btn-home-start').addEventListener('click', () => {
+  AudioFX.select();
+  showStageSelectFromHome();
+});
+
+// 게임 방법 버튼
+document.getElementById('btn-home-how').addEventListener('click', () => {
+  AudioFX.select();
+  document.getElementById('how-modal').classList.add('show');
+});
+
+// 게임 방법 닫기
+document.getElementById('how-close').addEventListener('click', () => {
+  document.getElementById('how-modal').classList.remove('show');
+});
+document.getElementById('how-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('how-modal'))
+    document.getElementById('how-modal').classList.remove('show');
+});
+
+// 뒤로가기 (스테이지 선택 → 홈)
+document.getElementById('btn-back-home').addEventListener('click', () => {
+  AudioFX.select();
+  showHome();
+});
+
+// 홈 화면으로 시작
+showHome();
+
 </script>
 </body>
 </html>
