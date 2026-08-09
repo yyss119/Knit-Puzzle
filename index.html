@@ -610,6 +610,66 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* ═══════════════ 이탈 확인 모달 ═══════════════ */
+#exit-modal {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(255,105,180,.62); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+}
+#exit-modal.show { display: flex; }
+#exit-box {
+  background: #FFF0F8;
+  border: 3px solid #CC0055;
+  box-shadow: 5px 5px 0 #660022, 7px 7px 0 #1A0010;
+  border-radius: 4px;
+  padding: 28px 24px 26px; max-width: 300px; width: 90%;
+  text-align: center;
+  animation: pop .22s cubic-bezier(.34,1.56,.64,1) forwards;
+  position: relative; overflow: hidden;
+}
+#exit-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    #FF69B4 0px, #FF69B4 8px, #FFD700 8px, #FFD700 16px,
+    #98FFD4 16px, #98FFD4 24px, #DDA0DD 24px, #DDA0DD 32px
+  );
+}
+#exit-emoji { font-size: 2.6rem; display: block; margin: 6px 0 8px; }
+#exit-title {
+  font-size: 1.4rem; color: #FF1493; letter-spacing: 3px; margin-bottom: 10px;
+  text-shadow: 1px 0 #1A0010, -1px 0 #1A0010, 0 1px #1A0010, 0 -1px #1A0010,
+    2px 2px 0 #CC0055;
+}
+#exit-msg {
+  font-family: 'Bakdahyeon', sans-serif; font-size: .88rem;
+  color: #662244; line-height: 1.9; margin-bottom: 18px;
+}
+#exit-msg span { color: #FF1493; font-size: 1rem; }
+#exit-btns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+#exit-cancel {
+  font-family: 'Bakdahyeon', sans-serif; font-size: .88rem; letter-spacing: 1px;
+  padding: 11px 8px; border-radius: 4px; cursor: pointer; width: 100%;
+  background: #E8B4FF; color: #3D006B;
+  border: 2px solid #1A0010;
+  box-shadow: 3px 3px 0 #7B007B, 4px 4px 0 #1A0010;
+  transition: transform .06s, box-shadow .06s;
+}
+#exit-cancel:active { transform: translate(3px,3px); box-shadow: 0 0 0 #7B007B, 1px 1px 0 #1A0010; }
+#exit-confirm {
+  font-family: 'Bakdahyeon', sans-serif; font-size: .88rem; letter-spacing: 1px;
+  padding: 11px 8px; border-radius: 4px; cursor: pointer; width: 100%;
+  background: #FF1493; color: #FFF0F8;
+  border: 2px solid #1A0010;
+  box-shadow: 3px 3px 0 #8B0040, 4px 4px 0 #1A0010;
+  text-shadow: 1px 1px 0 #1A0010;
+  transition: transform .06s, box-shadow .06s;
+}
+#exit-confirm:active { transform: translate(3px,3px); box-shadow: 0 0 0 #8B0040, 1px 1px 0 #1A0010; }
+
 /* ═══════════════ 게임 방법 모달 ═══════════════ */
 #how-modal {
   position: fixed; inset: 0; z-index: 400;
@@ -970,6 +1030,19 @@ body {
         <div id="match-text">일치율: <span id="match-pct">-</span></div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- 이탈 확인 모달 -->
+<div id="exit-modal">
+  <div id="exit-box">
+    <div id="exit-emoji">🧶</div>
+    <div id="exit-title">잠깐!</div>
+    <div id="exit-msg">지금 나가면 그린 내용이<br>모두 <span>초기화</span>돼요 😢<br>정말 패턴 목록으로 돌아갈까요?</div>
+    <div id="exit-btns">
+      <button id="exit-cancel">계속 그리기</button>
+      <button id="exit-confirm">목록으로 ▶</button>
     </div>
   </div>
 </div>
@@ -1369,7 +1442,7 @@ function initLevel(idx){
   const hintBtn = document.getElementById('btn-hint');
   if (hintBtn) { hintBtn.disabled = false; document.getElementById('hint-count').textContent = 3; }
   clearHintOverlays();
-  autoLoad(); updateProgress();
+  updateProgress();
   requestAnimationFrame(fitCanvas);
 }
 
@@ -1422,7 +1495,6 @@ function paintAt(key, clientX, clientY){
   const [r,c]=key.split(',').map(Number);
   playerGrid[r*lvl.cols+c]=isEraser?0:colorIdx+1;
   updateProgress(); drawPlayer();
-  autoSave();
   if(isEraser) AudioFX.erase(); else AudioFX.pop();
   spawnCellPop(c, r);
   if(clientX!=null) spawnSparkles(clientX, clientY);
@@ -1499,24 +1571,12 @@ function spawnSparkles(clientX, clientY){
   }
 }
 
-// ══ SAVE/LOAD ══════════════════════════════════════════
-const SAVE_KEY='knitpuzzle_save';
+// ══ SAVE/LOAD (스테이지 클리어 기록만 저장) ════════════
 const CLEAR_KEY='knitpuzzle_clears';
 function getClearData(){ try{ return JSON.parse(localStorage.getItem(CLEAR_KEY)||'{}'); }catch(e){return{};} }
 function saveClear(idx, stars){
   const d=getClearData();
   if(!d[idx]||d[idx]<stars){ d[idx]=stars; localStorage.setItem(CLEAR_KEY,JSON.stringify(d)); }
-}
-function autoSave(){
-  try{ localStorage.setItem(SAVE_KEY,JSON.stringify({idx:lvlIdx,grid:playerGrid})); }catch(e){}
-}
-function autoLoad(){
-  try{
-    const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
-    if(d&&d.idx===lvlIdx&&d.grid&&d.grid.length===playerGrid.length){
-      playerGrid=d.grid; drawPlayer(); updateProgress();
-    }
-  }catch(e){}
 }
 
 // ══ STAGE SELECT ══════════════════════════════════════
@@ -1554,7 +1614,14 @@ function showStageSelect(){
   document.getElementById('stage-select').style.display='';
 }
 
-document.getElementById('btn-menu').addEventListener('click', showStageSelect);
+document.getElementById('btn-menu').addEventListener('click', () => {
+  const painted = playerGrid.some(v => v !== 0);
+  if (painted) {
+    showExitConfirm();
+  } else {
+    showStageSelect();
+  }
+});
 
 // ── 한 줄 채우기 (우클릭 / 롱프레스) ──
 function fillRow(cell){
@@ -1790,6 +1857,21 @@ document.addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'h') useHint();
 });
 
+
+// ══════════════════════════════════════════════════
+//  이탈 확인 모달
+// ══════════════════════════════════════════════════
+function showExitConfirm() {
+  AudioFX.select();
+  document.getElementById('exit-modal').classList.add('show');
+}
+document.getElementById('exit-cancel').addEventListener('click', () => {
+  document.getElementById('exit-modal').classList.remove('show');
+});
+document.getElementById('exit-confirm').addEventListener('click', () => {
+  document.getElementById('exit-modal').classList.remove('show');
+  showStageSelect();
+});
 
 // ══════════════════════════════════════════════════
 //  홈 화면 로직
